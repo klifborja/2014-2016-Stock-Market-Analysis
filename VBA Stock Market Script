@@ -1,0 +1,70 @@
+Attribute VB_Name = "Module1"
+Sub VBAWallStreetII()
+     
+    ' Declare Variables
+    Dim currentWS As Worksheet
+    Dim Ticker As String
+    Dim Current_Ticker As String
+    Dim Next_Ticker As String
+    Dim Total_Volume As LongLong
+    Total_Volume = 0 ' Set Initial Variable
+    Dim LastRow As Long
+    Dim Summary_Table_Row As Long ' Keeps track of location for each Ticker
+    Summary_Table_Row = 2
+
+   
+        ' Starting For loop through each worksheet
+        For Each currentWS In Worksheets
+        'Inserting Headers
+        Cells(1, 9).Value = "Ticker"
+        Cells(1, 10).Value = "Yearly Change"
+        Cells(1, 11).Value = "Percent Change"
+        Cells(1, 12).Value = "Total Stock Volume"
+        
+            ' Determine Last Row of each worksheet
+            LastRow = currentWS.Cells(Rows.Count, 1).End(xlUp).Row
+    
+            ' Start For Loop through data
+            For i = 2 To LastRow
+            
+                ' Set Value for Tickers
+                Current_Ticker = Cells(i, 1).Value
+                Next_Ticker = Cells(i + 1, 1).Value
+            
+                ' Start If statement to set Ticker Namer and change the Ticker when the Value changes
+                If Current_Ticker <> Next_Ticker Then
+                Ticker = Current_Ticker
+                Current_Ticker = Next_Ticker
+                
+                ' Start adding the Total Stock Volume
+                Total_Volume = Total_Volume + Cells(i, 7).Value
+                
+                ' Call Sub to Summarize the Data for the Current Ticker
+                Call summarize(Ticker, Total_Volume, Summary_Table_Row)
+                
+                ' Reset Total Stock Volume
+                Total_Volume = 0
+                
+                ' Add one to Summary Table Row
+                Summary_Table_Row = Summary_Table_Row + 1
+                
+                ' Checks if following cell is same Ticker
+                Else
+                
+                ' Adds to Total Stock Volume for Current Ticker
+                Total_Volume = Total_Volume + Cells(i, 7).Value
+            
+                End If
+            
+            Next i
+    
+        Next
+      
+End Sub
+
+Sub summarize(Ticker, Total_Volume, Summary_Table_Row)
+    Range("I" & Summary_Table_Row).Value = Ticker
+    Range("J" & Summary_Table_Row).Value = Yearly_Change
+    Range("K" & Summary_Table_Row).Value = Percent_Change
+    Range("L" & Summary_Table_Row).Value = Total_Volume
+End Sub
